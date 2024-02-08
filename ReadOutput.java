@@ -1,38 +1,40 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ReadOutput {
 
-    double timePassed;
+    private int timePassed;
     private int id; //VRU id
     private double v; //velocity
     private double a; //acceleration
     private double xpos;
     private double ypos;
-    private int nrOfVRUs;
     Scanner vsc;
     Scanner psc;
     Scanner csc;
     File vDataOutput;
     File pDataOutput;
     File cDataOutput;
+    File eDataOutput;
 
     public ReadOutput(String outputPath) {
 
         vDataOutput = new File(outputPath + "\\velocity.txt");
         pDataOutput = new File(outputPath + "\\position.txt");
-        cDataOutput = new File(outputPath + "\\nrPedAtSameTime.txt");
+        cDataOutput = new File(outputPath + "\\noOfEntities.txt");
+        eDataOutput = new File(outputPath + "\\evacTime.txt");
     }
 
     public int totalNrOfVRUs() throws FileNotFoundException {
 
         csc = new Scanner(cDataOutput);
         csc.nextLine();
-        timePassed = (double) csc.nextInt() / 10;
+        timePassed = csc.nextInt();
         int currentNr;
         int previousNr = csc.nextInt();
-        nrOfVRUs = previousNr;
+        int nrOfVRUs = previousNr;
 
         while(csc.hasNextInt()) {
 
@@ -49,6 +51,7 @@ public class ReadOutput {
         return nrOfVRUs;
     }
 
+
     public double meanVelocity(int VRUid) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
@@ -57,7 +60,7 @@ public class ReadOutput {
         int count = 0;
         while(vsc.hasNext()) {
 
-            timePassed = (double) vsc.nextInt() / 10;
+            timePassed = vsc.nextInt();
 
             if(VRUid == vsc.nextInt()) {
                 vsum += vsc.nextDouble();
@@ -77,7 +80,7 @@ public class ReadOutput {
 
         while(vsc.hasNext()) {
 
-            timePassed = (double) vsc.nextInt() / 10;
+            timePassed = vsc.nextInt();
 
             if(VRUid == vsc.nextInt())
                 if((currentV = vsc.nextDouble()) > maxV)
@@ -115,7 +118,7 @@ public class ReadOutput {
 
         while(vsc.hasNext()) {
 
-            timePassed = (double) vsc.nextInt() / 10;
+            timePassed = vsc.nextInt();
             if(VRUid == vsc.nextInt())
                 break;
             vsc.nextLine();
@@ -125,7 +128,7 @@ public class ReadOutput {
 
         while(vsc.hasNext()) {
 
-            timePassed = (double) vsc.nextInt() / 10;
+            timePassed = vsc.nextInt();
 
             if(VRUid == vsc.nextInt()) {
                 currentV = vsc.nextDouble();
@@ -150,7 +153,7 @@ public class ReadOutput {
 
         while(vsc.hasNext()) {
 
-            timePassed = (double) vsc.nextInt() / 10;
+            timePassed = vsc.nextInt();
 
             if(VRUid == vsc.nextInt()) {
                 currentV = vsc.nextDouble();
@@ -184,5 +187,45 @@ public class ReadOutput {
             vsc.nextLine();
         }
         return a;
+    }
+
+    public Node getDataAt(int timeStamp, int VRUid) throws FileNotFoundException {
+
+        psc = new Scanner(pDataOutput);
+        v = velocityAtGivenTime(VRUid, timeStamp);
+        psc.nextLine();
+
+
+        while(psc.hasNext()) {
+
+            if(psc.nextInt() == timeStamp) {
+                if(psc.nextInt() == VRUid) {
+                    xpos = psc.nextDouble();
+                    ypos = psc.nextDouble();
+                    break;
+                }
+            }
+            psc.nextLine();
+        }
+        return new Node(timeStamp, VRUid, xpos, ypos, v);
+    }
+
+    public ArrayList<Node> getDataFor(int VRUid) throws FileNotFoundException {
+
+        psc = new Scanner(pDataOutput);
+        ArrayList<Node> nodeList = new ArrayList<>();
+        psc.nextLine();
+
+        while(psc.hasNext()) {
+
+            timePassed = psc.nextInt();
+
+            if(psc.nextInt() == VRUid)
+                nodeList.add(getDataAt(timePassed, VRUid));
+
+            psc.nextLine();
+        }
+
+        return nodeList;
     }
 }
