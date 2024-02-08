@@ -8,4 +8,4 @@ For example:
 Make sure your files are correctly named:
   -  Velocity output file -> velocity.txt
   -  Position output file -> position.txt
-  -  No of entites file -> nrPedAtSameTime.txt
+  -  No of entites file -> noOfEntities.txt
