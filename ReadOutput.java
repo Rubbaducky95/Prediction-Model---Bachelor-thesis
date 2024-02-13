@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class ReadOutput {
@@ -30,6 +31,7 @@ public class ReadOutput {
     public int totalNrOfVRUs() throws FileNotFoundException {
 
         csc = new Scanner(cDataOutput);
+        csc.useLocale(Locale.US);
         csc.nextLine();
         timePassed = csc.nextInt();
         int currentNr;
@@ -55,6 +57,7 @@ public class ReadOutput {
     public double meanVelocity(int VRUid) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
+        vsc.useLocale(Locale.US);
         vsc.nextLine();
         double vsum = 0;
         int count = 0;
@@ -74,6 +77,7 @@ public class ReadOutput {
     public double maxVelocity(int VRUid) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
+        vsc.useLocale(Locale.US);
         vsc.nextLine();
         double maxV = 0;
         double currentV;
@@ -94,6 +98,7 @@ public class ReadOutput {
     public double velocityAtGivenTime(int VRUid, int timeStep) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
+        vsc.useLocale(Locale.US);
         vsc.nextLine();
 
         while(vsc.hasNext()) {
@@ -110,6 +115,7 @@ public class ReadOutput {
     public double meanAcceleration(int VRUid) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
+        vsc.useLocale(Locale.US);
         vsc.nextLine();
         int count = 0;
         double previousV = 0;
@@ -144,6 +150,7 @@ public class ReadOutput {
     public double maxAcceleration(int VRUid) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
+        vsc.useLocale(Locale.US);
         vsc.nextLine();
         double maxA = 0;
         double previousV = 0;
@@ -169,6 +176,7 @@ public class ReadOutput {
     public double accelerationAtGivenTime(int VRUid, int timeStep) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
+        vsc.useLocale(Locale.US);
         vsc.nextLine();
         double previousV = 0;
 
@@ -192,6 +200,7 @@ public class ReadOutput {
     public Node getDataAt(int timeStamp, int VRUid) throws FileNotFoundException {
 
         psc = new Scanner(pDataOutput);
+        psc.useLocale(Locale.US);
         v = velocityAtGivenTime(VRUid, timeStamp);
         psc.nextLine();
 
@@ -213,6 +222,7 @@ public class ReadOutput {
     public ArrayList<Node> getDataFor(int VRUid) throws FileNotFoundException {
 
         psc = new Scanner(pDataOutput);
+        psc.useLocale(Locale.US);
         ArrayList<Node> nodeList = new ArrayList<>();
         psc.nextLine();
 
@@ -227,5 +237,19 @@ public class ReadOutput {
         }
 
         return nodeList;
+    }
+
+    public ArrayList<Node> getXDataAt(int timeStep, int noSteps, int VRUid) throws FileNotFoundException {
+
+        ArrayList<Node> dataAtEachStep = new ArrayList<>();
+        for(int i = 0; i < noSteps; i++) {
+
+            if(timeStep != 0) {
+                dataAtEachStep.add(getDataAt(timeStep, VRUid));
+                timeStep--;
+            }
+            else break;
+        }
+        return dataAtEachStep;
     }
 }
