@@ -1,0 +1,13 @@
+import java.util.ArrayList;
+
+public class Model {
+
+    public int checkForChange(ArrayList<Node> nlist){
+
+        if()
+        return 0;
+    }
+    public double[] predictNextPosition(ArrayList<Node> n) {
+        return null;
+    }
+}
