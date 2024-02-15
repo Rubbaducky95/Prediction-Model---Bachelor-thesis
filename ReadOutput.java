@@ -252,4 +252,19 @@ public class ReadOutput {
         }
         return dataAtEachStep;
     }
+
+    public double distanceBetween(Node n1, Node n2){
+
+        return Math.sqrt(Math.pow(n2.x-n1.x,2)+Math.pow(n2.y-n1.y,2));
+    }
+
+    public double changeInAngle(ArrayList<Node> n){
+
+        return 0;
+    }
+
+    public double getAPFP(int VRUid, int timeStep, int possibleTurningRadius){
+
+        return 0;
+    }
 }
