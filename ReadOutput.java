@@ -53,6 +53,33 @@ public class ReadOutput {
         return nrOfVRUs;
     }
 
+    public int[] timeStepsFor(int VRUid) throws FileNotFoundException {
+
+        vsc = new Scanner(vDataOutput);
+        vsc.useLocale(Locale.US);
+        vsc.nextLine();
+        int startTime = vsc.nextInt(); //What timestep we start counting from.
+        while(vsc.hasNext()){
+            if(vsc.nextInt() != VRUid) {
+                vsc.nextLine();
+                startTime = vsc.nextInt();
+            } else {
+                vsc.nextLine();
+                break;
+            }
+        }
+
+        int noOftimeSteps = 0; //How many timesteps from the starting time.
+        while(vsc.hasNext()) {
+            timePassed = vsc.nextInt();
+            if(vsc.nextInt() == VRUid) {
+                noOftimeSteps++;
+                vsc.nextLine();
+            } else { vsc.nextLine(); }
+        }
+        return new int[]{startTime, noOftimeSteps};
+    }
+
 
     public double meanVelocity(int VRUid) throws FileNotFoundException {
 
