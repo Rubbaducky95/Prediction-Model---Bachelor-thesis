@@ -70,17 +70,23 @@ public class Model {
         return predictionList;
     }
 
-    public static double[] coordinateRMSE(ArrayList<Node> actualPos, double t, int noDataPoints) {
+    public static double[] coordinateRMSE(ArrayList<Node> actualPos, double t, int noDataPoints, int flag) { //flag: 0 for the old way, 1 for polynomial regression
 
         ArrayList<Node> temp = new ArrayList<>();
         ArrayList<Double> difference = new ArrayList<>();
         ArrayList<Double> newX = new ArrayList<>();
         ArrayList<Double> newY = new ArrayList<>();
-        double[] predictedPos;
+        double[] predictedPos = new double[2];
 
         for(Node n : actualPos) {
+
             temp.add(n);
-            predictedPos = predictNextPosition(temp, t, noDataPoints);
+
+            if(flag == 0)
+                predictedPos = predictNextPosition(temp, t, noDataPoints);
+            else if(flag == 1)
+                predictedPos = predictionPolynomialRegression(temp,noDataPoints-1,t);
+
             newX.add(predictedPos[0]);
             newY.add(predictedPos[1]);
         }
