@@ -5,22 +5,25 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
-        String filePath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\Simulations\\Test\\output\\Curve_2024-02-20_15-48-11.782";
+        String filePath = "C:\\Users\\ruben\\OneDrive\\Dokument\\Högskolan\\DCTVT24\\EXAMENS ARBETE\\Simulation\\Simulations\\Test\\output\\Curve_2024-02-20_15-48-11.782";
         ReadOutput whatToRead = new ReadOutput(filePath);
 
         ArrayList<Node> VRU = whatToRead.getDataFor(1);
-        ArrayList<Node> predictedVRU = new ArrayList<>();
-        ArrayList<Node> temp = new ArrayList<>();
-        Node tempNode;
-        double[] predPos;
+        ArrayList<Node> predictedVRU = Model.getPredictionList(VRU);
 
-        for(Node n : VRU) {
-            temp.add(n);
-            predPos = Model.predictNextPosition(temp,0.5,2);
-            tempNode = new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v);
-            predictedVRU.add(tempNode);
-        }
+        ArrayList<Node> test = new ArrayList<>();
 
+        for(int i = 0; i < 10; i++)
+            test.add(VRU.get(i));
+
+        double[] testPoly = Model.predictionPolynomialRegression(test, 3, 0.5);
+
+        System.out.println(test);
+        System.out.println("\n" + "Predicted position, timestep 11: \n" + "x: " + testPoly[0] + " y: " + testPoly[1]);
+
+
+
+        /*
         ArrayList<ArrayList<Node>> listOfNodeLists = new ArrayList<>();
         listOfNodeLists.add(VRU);
         listOfNodeLists.add(predictedVRU);
@@ -29,6 +32,7 @@ public class Main {
             MainFrame frame = new MainFrame(listOfNodeLists, 20.0);
             frame.setVisible(true);
         });
+        */
 
         /*System.out.println(Model.positionalRMSE(VRU, 0.5, 4));
         double[] RMSEcord = Model.coordinateRMSE(VRU, 0.5, 4);
