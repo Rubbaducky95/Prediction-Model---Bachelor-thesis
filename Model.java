@@ -129,29 +129,62 @@ public class Model {
         WeightedObservedPoints obsX = new WeightedObservedPoints();
         WeightedObservedPoints obsY = new WeightedObservedPoints();
 
-        for(int i = 0; i < degree+1; i++) {
+        if(n.size() < degree + 1) { //If we have more data points to look at than there are nodes in the list we go here.
 
-            double t = n.get(n.size()-degree-1+i).timeStep / simTime;
-            double x = n.get(n.size()-degree-1+i).x;
-            double y = n.get(n.size()-degree-1+i).y;
-            obsX.add(t, x);
-            obsY.add(t, y);
+            //Number of data points to look at is limited to the size of the list
+            for(int i = 0; i < n.size(); i++) {
+
+                double t = n.get(i).timeStep / simTime;
+                double x = n.get(i).x;
+                double y = n.get(i).y;
+                obsX.add(t, x);
+                obsY.add(t, y);
+            }
+
+            PolynomialCurveFitter fitter = PolynomialCurveFitter.create(n.size()-1);
+
+            double[] coX = fitter.fit(obsX.toList());
+            double[] coY = fitter.fit(obsY.toList());
+
+            double newX = 0;
+            double newY = 0;
+
+            for(int i = 0; i < n.size(); i++) {
+
+                newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+                newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+            }
+
+            return new double[] {newX, newY};
         }
 
-        PolynomialCurveFitter fitter = PolynomialCurveFitter.create(degree);
+        else { //Look at the number of data points we chose, and predict next position.
 
-        double[] coX = fitter.fit(obsX.toList());
-        double[] coY = fitter.fit(obsY.toList());
+            //Number of data points we look at is "degree" + 1.
+            for (int i = 0; i < degree + 1; i++) {
 
-        double newX = 0;
-        double newY = 0;
+                double t = n.get(n.size() - degree - 1 + i).timeStep / simTime;
+                double x = n.get(n.size() - degree - 1 + i).x;
+                double y = n.get(n.size() - degree - 1 + i).y;
+                obsX.add(t, x);
+                obsY.add(t, y);
+            }
 
-        for(int i = 0; i < degree+1; i++) {
+            PolynomialCurveFitter fitter = PolynomialCurveFitter.create(degree);
 
-            newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
-            newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+            double[] coX = fitter.fit(obsX.toList());
+            double[] coY = fitter.fit(obsY.toList());
+
+            double newX = 0;
+            double newY = 0;
+
+            for(int i = 0; i < degree + 1; i++) {
+
+                newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+                newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+            }
+
+            return new double[] {newX, newY};
         }
-
-        return new double[] {newX, newY};
     }
 }
