@@ -1,7 +1,11 @@
 import java.util.ArrayList;
+import org.apache.commons.math4.legacy.fitting.PolynomialCurveFitter;
+import org.apache.commons.math4.legacy.fitting.WeightedObservedPoints;
+
+
 /*
-* Handles all functions with lists of positions
-* */
+ * Handles all functions with lists of positions
+ * */
 public class Model {
 
     public static int checkForChange(ArrayList<Node> nList, int noDataPoints){
@@ -49,6 +53,21 @@ public class Model {
         }
 
         return newPos;
+    }
+
+    public static ArrayList<Node> getPredictionList(ArrayList<Node> nList) {
+
+        ArrayList<Node> temp = new ArrayList<>();
+        ArrayList<Node> predictionList = new ArrayList<>();
+        double[] predPos;
+        Node tempNode;
+        for(Node n : nList) {
+            temp.add(n);
+            predPos = Model.predictNextPosition(temp,0.5,2);
+            tempNode = new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v);
+            predictionList.add(tempNode);
+        }
+        return predictionList;
     }
 
     public static double[] coordinateRMSE(ArrayList<Node> actualPos, double t, int noDataPoints) {
@@ -103,5 +122,36 @@ public class Model {
         }
 
         return RMSE = Math.sqrt(RMSE / difference.size());
+    }
+
+    public static double[] predictionPolynomialRegression(ArrayList<Node> n, int degree, double simTime) {
+
+        WeightedObservedPoints obsX = new WeightedObservedPoints();
+        WeightedObservedPoints obsY = new WeightedObservedPoints();
+
+        for(int i = 0; i < degree+1; i++) {
+
+            double t = n.get(n.size()-degree-1+i).timeStep / simTime;
+            double x = n.get(n.size()-degree-1+i).x;
+            double y = n.get(n.size()-degree-1+i).y;
+            obsX.add(t, x);
+            obsY.add(t, y);
+        }
+
+        PolynomialCurveFitter fitter = PolynomialCurveFitter.create(degree);
+
+        double[] coX = fitter.fit(obsX.toList());
+        double[] coY = fitter.fit(obsY.toList());
+
+        double newX = 0;
+        double newY = 0;
+
+        for(int i = 0; i < degree+1; i++) {
+
+            newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+            newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+        }
+
+        return new double[] {newX, newY};
     }
 }
