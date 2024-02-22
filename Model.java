@@ -8,13 +8,13 @@ import org.apache.commons.math4.legacy.fitting.WeightedObservedPoints;
  * */
 public class Model {
 
-    public static int checkForChange(ArrayList<Node> nList, int noDataPoints){
+    public static int checkForChange(ArrayList<Node> nList){
 
-        if(nList.size() < noDataPoints) //Too few nodes to use in prediction
-            return 0;
+        if(nList.size() < 2) //Too few nodes to use in prediction
+            return 1;
 
         Node curPos = nList.get(nList.size()-1);
-        Node prevPos = nList.get(nList.size()-noDataPoints);
+        Node prevPos = nList.get(nList.size()-2);
 
         if(curPos.v - prevPos.v >= 0.5 || curPos.distanceBetween(prevPos) >= 4)
             return 1; //We are accelerating, keep going straight.
@@ -38,7 +38,7 @@ public class Model {
             return newPos;
         }
 
-        int change = checkForChange(n, noDataPoints);
+        int change = checkForChange(n);
         Node curPos = n.get(n.size()-1);
         Node prevPos = n.get(n.size()-noDataPoints);
 
@@ -54,86 +54,16 @@ public class Model {
 
         return newPos;
     }
-
-    public static ArrayList<Node> getPredictionList(ArrayList<Node> nList) {
-
-        ArrayList<Node> temp = new ArrayList<>();
-        ArrayList<Node> predictionList = new ArrayList<>();
-        double[] predPos;
-        Node tempNode;
-        for(Node n : nList) {
-            temp.add(n);
-            predPos = Model.predictNextPosition(temp,0.5,2);
-            tempNode = new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v);
-            predictionList.add(tempNode);
-        }
-        return predictionList;
-    }
-
-    public static double[] coordinateRMSE(ArrayList<Node> actualPos, double t, int noDataPoints, int flag) { //flag: 0 for the old way, 1 for polynomial regression
-
-        ArrayList<Node> temp = new ArrayList<>();
-        ArrayList<Double> difference = new ArrayList<>();
-        ArrayList<Double> newX = new ArrayList<>();
-        ArrayList<Double> newY = new ArrayList<>();
-        double[] predictedPos = new double[2];
-
-        for(Node n : actualPos) {
-
-            temp.add(n);
-
-            if(flag == 0)
-                predictedPos = predictNextPosition(temp, t, noDataPoints);
-            else if(flag == 1)
-                predictedPos = predictionPolynomialRegression(temp,noDataPoints-1,t);
-
-            newX.add(predictedPos[0]);
-            newY.add(predictedPos[1]);
-        }
-
-        double RMSEx = 0;
-        double RMSEy = 0;
-        int i = 0;
-
-        for(Node n : temp) {
-            RMSEx += Math.pow(n.x - newX.get(i),2);
-            RMSEy += Math.pow(n.y - newY.get(i),2);
-            i++;
-        }
-
-        RMSEx = Math.sqrt(RMSEx / temp.size());
-        RMSEy = Math.sqrt(RMSEy / temp.size());
-
-        return new double[]{RMSEx, RMSEy};
-    }
-
-    public static double positionalRMSE(ArrayList<Node> actualPos, double t, int noDataPoints) {
-
-        ArrayList<Node> temp = new ArrayList<>();
-        ArrayList<Double> difference = new ArrayList<>();
-        Node tempNode;
-        double[] predictedPos;
-
-        for(Node n : actualPos) {
-            temp.add(n);
-            predictedPos = predictNextPosition(temp, t, noDataPoints);
-            tempNode = new Node(n.timeStep+1, n.id, predictedPos[0], predictedPos[1], n.v);
-            difference.add(tempNode.distanceBetween(n));
-        }
-
-        double RMSE = 0;
-
-        for(double dif : difference) {
-            RMSE += Math.pow(dif,2);
-        }
-
-        return RMSE = Math.sqrt(RMSE / difference.size());
-    }
-
     public static double[] predictionPolynomialRegression(ArrayList<Node> n, int degree, double simTime) {
 
         WeightedObservedPoints obsX = new WeightedObservedPoints();
         WeightedObservedPoints obsY = new WeightedObservedPoints();
+
+        /*int status = checkForChange(n);
+        if (status == 1)
+            degree = 5;
+        else if (status == -1)
+            degree = 2;*/
 
         if(n.size() < degree + 1) { //If we have more data points to look at than there are nodes in the list we go here.
 
@@ -192,5 +122,54 @@ public class Model {
 
             return new double[] {newX, newY};
         }
+    }
+
+    public static ArrayList<Node> getPredictionList(ArrayList<Node> nList, double t, int noOfDataPoints, int flag) {//0 for old prediction model, 1 for polynomial regression model
+
+        ArrayList<Node> temp = new ArrayList<>();
+        ArrayList<Node> predictionList = new ArrayList<>();
+        double[] predPos = new double[2];
+        Node tempNode;
+        for(Node n : nList) {
+            temp.add(n);
+            if(flag == 0)
+                predPos = predictNextPosition(temp,t,noOfDataPoints);
+            else if(flag == 1)
+                predPos = predictionPolynomialRegression(temp,noOfDataPoints-1,t);
+            tempNode = new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v);
+            predictionList.add(tempNode);
+        }
+        return predictionList;
+    }
+
+    public static double[] coordinateRMSE(ArrayList<Node> actualPos, ArrayList<Node> predictedPos, double t, int noDataPoints) { //flag: 0 for the old way, 1 for polynomial regression
+
+        double RMSEx = 0;
+        double RMSEy = 0;
+
+        for(int i = 1; i < actualPos.size(); i++) {
+            RMSEx += Math.pow(actualPos.get(i).x - predictedPos.get(i-1).x,2);
+            RMSEy += Math.pow(actualPos.get(i).y - predictedPos.get(i-1).y,2);
+        }
+
+        RMSEx = Math.sqrt(RMSEx / predictedPos.size());
+        RMSEy = Math.sqrt(RMSEy / predictedPos.size());
+
+        return new double[]{RMSEx, RMSEy};
+    }
+
+    public static double positionalRMSE(ArrayList<Node> actualPos, ArrayList<Node> predictedPos) { //0 for old prediction model, 1 for polynomial prograssion model
+
+        Node tempNode;
+        double RMSE = 0;
+        int timeStep = actualPos.get(0).timeStep;
+        int id = actualPos.get(0).id;
+
+        for(int i = 1; i < actualPos.size(); i++) {
+            tempNode = new Node(++timeStep, id, predictedPos.get(i-1).x, predictedPos.get(i-1).y, actualPos.get(i).v);//Temporarirly get the v from actual position will predict it later
+            RMSE += Math.pow(tempNode.distanceBetween(actualPos.get(i)),2);
+        }
+
+        return Math.sqrt(RMSE / actualPos.size());
     }
 }
