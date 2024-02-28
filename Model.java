@@ -4,8 +4,9 @@ import org.apache.commons.math4.legacy.fitting.WeightedObservedPoints;
 
 
 /*
+
  * Handles all functions with lists of positions
- * */
+ */
 public class Model {
 
     public static int checkForChange(ArrayList<Node> nList){
@@ -61,9 +62,10 @@ public class Model {
 
         /*int status = checkForChange(n);
         if (status == 1)
-            degree = 5;
+            degree = 2;
         else if (status == -1)
-            degree = 2;*/
+            degree = 2;
+         */
 
         if(n.size() < degree + 1) { //If we have more data points to look at than there are nodes in the list we go here.
 
