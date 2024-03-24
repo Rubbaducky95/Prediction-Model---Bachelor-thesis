@@ -17,12 +17,21 @@ public class Model {
         Node curPos = nList.get(nList.size()-1);
         Node prevPos = nList.get(nList.size()-2);
 
-        if(curPos.v - prevPos.v >= 0.5 || curPos.distanceBetween(prevPos) >= 4)
+        if(nList.size() < 3) { //Can't check for angle change with only two nodes
+            if (curPos.v - prevPos.v >= 0.5)
+                return 1; //We are accelerating, keep going straight.
+            else if (curPos.v - prevPos.v <= -0.5)
+                return -1; //We are de-accelerating, we might turn.
+            else
+                return 1; //No significant change, we keep going straight.
+        }
+
+        Node prevPrevPos = nList.get(nList.size()-3);
+
+        if(curPos.v - prevPos.v >= 0.5 || curPos.angleBetween(prevPos, prevPrevPos) <= 4)
             return 1; //We are accelerating, keep going straight.
-
-        else if(curPos.v - prevPos.v <= -0.5)
+        else if(curPos.v - prevPos.v <= -0.5 || curPos.angleBetween(prevPos, prevPrevPos) > 4)
             return -1; //We are de-accelerating, we might turn.
-
         else
             return 1; //No significant change, we keep going straight.
     }
@@ -59,13 +68,6 @@ public class Model {
 
         WeightedObservedPoints obsX = new WeightedObservedPoints();
         WeightedObservedPoints obsY = new WeightedObservedPoints();
-
-        /*int status = checkForChange(n);
-        if (status == 1)
-            degree = 2;
-        else if (status == -1)
-            degree = 2;
-         */
 
         if(n.size() < degree + 1) { //If we have more data points to look at than there are nodes in the list we go here.
 
@@ -125,7 +127,6 @@ public class Model {
             return new double[] {newX, newY};
         }
     }
-
     public static ArrayList<Node> getPredictionList(ArrayList<Node> nList, double t, int noOfDataPoints, int flag) {//0 for old prediction model, 1 for polynomial regression model
 
         ArrayList<Node> temp = new ArrayList<>();
@@ -143,7 +144,6 @@ public class Model {
         }
         return predictionList;
     }
-
     public static double[] coordinateRMSE(ArrayList<Node> actualPos, ArrayList<Node> predictedPos, double t, int noDataPoints) { //flag: 0 for the old way, 1 for polynomial regression
 
         double RMSEx = 0;
@@ -159,7 +159,6 @@ public class Model {
 
         return new double[]{RMSEx, RMSEy};
     }
-
     public static double positionalRMSE(ArrayList<Node> actualPos, ArrayList<Node> predictedPos) { //0 for old prediction model, 1 for polynomial prograssion model
 
         Node tempNode;
@@ -173,5 +172,15 @@ public class Model {
         }
 
         return Math.sqrt(RMSE / actualPos.size());
+    }
+    public static ArrayList<Double> getDifferenceInDistanceList(ArrayList<Node> actualPos, ArrayList<Node> predictedPos) {
+
+        ArrayList<Double> diffList = new ArrayList<>();
+        int i = 0;
+        for(Node n : actualPos){
+            diffList.add(n.distanceBetween(predictedPos.get(i)));
+            i++;
+        }
+        return diffList;
     }
 }
