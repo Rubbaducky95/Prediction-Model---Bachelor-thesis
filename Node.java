@@ -49,17 +49,32 @@ public class Node implements Comparable<Node>{
         return Math.sqrt(Math.pow(this.x - n.x,2) + Math.pow(this.y-n.y,2));
     }
 
-    public double angleBetween(Node n) {
+    public double lengthOf() {
 
-        return Math.atan(Math.abs(this.y - n.y) / Math.abs(this.x - n.x));
+        return Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
+    }
+    public double directionOfVector(Node n) {
+
+        //Initial point in vector is "this" node, while the direction is determined by node "n".
+        double vectorX = n.x - this.x;
+        double vectorY = n.y - this.y;
+
+        //Determine what quadrant the vector lies in
+        double angle = Math.atan(vectorY / vectorX) * 180 / Math.PI;
+        return angle;
+    }
+
+    public double angleBetween(Node n1, Node n2) { //"this" is current node, n1 is two nodes back, and n2 is previous node.
+
+        return Math.abs(n1.directionOfVector(n2) - n2.directionOfVector(this));
     }
 
     public double getVx(Node n) { //Input is the current position
-        return n.v * Math.cos(this.angleBetween(n));
+        return n.v * Math.cos(this.directionOfVector(n));
     }
 
     public double getVy(Node n) { //Input is the current position
-        return n.v * Math.sin(this.angleBetween(n));
+        return n.v * Math.sin(this.directionOfVector(n));
     }
 
     public String toString(){
