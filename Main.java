@@ -9,42 +9,43 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Main {
-        public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException {
 
-            String filePath = "C:\\Users\\ruben\\OneDrive\\Dokument\\Högskolan\\DCTVT24\\EXAMENS ARBETE\\Simulation\\Simulations\\Test\\output\\Curve_2024-02-20_15-48-11.782";
-            ReadOutput whatToRead = new ReadOutput(filePath);
+        String filePath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\Simulations\\Test\\output\\";
+        String fileName = "S-turn_0.9s_50VRUs";
+        ReadOutput whatToRead = new ReadOutput(filePath + fileName);
 
-            ArrayList<Double> RMSEforDifVRUs = new ArrayList<>();
-            StringBuilder output = new StringBuilder("pedestrianID no.dataPoints minRMSE\n");
-            double minRMSE;
-            int totNrVRUs = whatToRead.totalNrOfVRUs();
+        //ToTxt.differenceListForAllVRUs(whatToRead,0.9,3,1);
+        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,2,1,1);
+        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,3,1,1);
+        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,4,1,1);
+        //ToTxt.actualPositionsForVRU(whatToRead,1);
+        //ToTxt.RMSEforVRUsWithSpecDataPoints(whatToRead,0.9,2,1);
+        ToTxt.minMaxRMSEforDataPoints(whatToRead,0.9,2,6,1);
 
-            for(int i = 1; i <= totNrVRUs; i++) {
+        /*ArrayList<Node> VRU = whatToRead.getDataFor(1);
 
-                ArrayList<Node> VRU = whatToRead.getDataFor(i);
-                System.out.println("pedestrianID: " + i);
-                output.append(i).append(" ");
+        Node n1 = VRU.get(0);
+        Node n2 = VRU.get(1);
 
-                for(int j = 1; j < 10; j++) {
-                    RMSEforDifVRUs.add(Model.positionalRMSE(VRU, Model.getPredictionList(VRU, 0.5, j, 1)));
-                }
+        ArrayList<Double> angles = new ArrayList<>();
 
-                minRMSE = Collections.min(RMSEforDifVRUs);
-                System.out.println("No. data points: " + (1+RMSEforDifVRUs.indexOf(minRMSE)));
-                output.append((1+RMSEforDifVRUs.indexOf(minRMSE))).append(" ");
-                System.out.println("Min RMSE: " + minRMSE);
-                output.append(Collections.min(RMSEforDifVRUs)).append("\n");
-                RMSEforDifVRUs.clear();
-                VRU.clear();
-            }
+        for (int i = 2; i < VRU.size(); i++) {
+            angles.add(VRU.get(i).angleBetween(n1,n2));
+            n1 = VRU.get(i-1);
+            n2 = VRU.get(i);
+        }
 
-            try {
-                FileWriter writer = new FileWriter("result.txt");
-                writer.write(String.valueOf(output));
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        ArrayList<Node> test = new ArrayList<>();
+        ArrayList<Integer> changeFlags = new ArrayList<>();
+
+        for(Node n : VRU) {
+            test.add(n);
+            changeFlags.add(Model.checkForChange(test));
+        }
+        System.out.println(angles);
+        System.out.println(changeFlags);*/
+
 
 
 /*
