@@ -1,5 +1,5 @@
 {
-  "name" : "S-turn",
+  "name" : "Curve2",
   "description" : "",
   "release" : "3.0",
   "processWriters" : {
@@ -68,7 +68,7 @@
         "pedestrianBodyPotential" : 2.72,
         "pedestrianRecognitionDistance" : 2.5,
         "obstacleBodyPotential" : 20.1,
-        "obstacleRepulsionStrength" : 0.8
+        "obstacleRepulsionStrength" : 0.4
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
@@ -93,7 +93,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1030.0,
+      "finishTime" : 550.0,
       "simTimeStepLength" : 0.9,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -105,7 +105,7 @@
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : true,
+      "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "SimpleCognitionModel",
@@ -130,7 +130,7 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 30.0,
+          "width" : 20.0,
           "height" : 20.0
         },
         "boundingBoxWidth" : 0.5,
@@ -138,101 +138,82 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
-        "id" : 22,
+        "id" : 6,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 0.5,
-            "y" : 19.5
+            "x" : 9.0,
+            "y" : 16.0
           }, {
-            "x" : 0.5,
+            "x" : 6.0,
+            "y" : 15.0
+          }, {
+            "x" : 5.0,
+            "y" : 14.0
+          }, {
+            "x" : 4.0,
+            "y" : 11.0
+          }, {
+            "x" : 4.0,
             "y" : 0.5
           }, {
-            "x" : 1.0,
+            "x" : 6.0,
             "y" : 0.5
           }, {
-            "x" : 1.0,
-            "y" : 0.4
+            "x" : 19.5,
+            "y" : 0.5
           }, {
-            "x" : 27.0,
-            "y" : 0.4
+            "x" : 19.5,
+            "y" : 15.9
           }, {
-            "x" : 27.0,
-            "y" : 3.0
-          }, {
-            "x" : 26.8,
-            "y" : 4.0
-          }, {
-            "x" : 26.5,
-            "y" : 5.0
-          }, {
-            "x" : 26.0,
-            "y" : 6.0
-          }, {
-            "x" : 25.0,
-            "y" : 6.9
-          }, {
-            "x" : 24.0,
-            "y" : 7.5
-          }, {
-            "x" : 23.0,
-            "y" : 7.8
-          }, {
-            "x" : 22.0,
-            "y" : 8.0
-          }, {
-            "x" : 1.0,
-            "y" : 8.0
-          }, {
-            "x" : 1.0,
-            "y" : 19.5
+            "x" : 10.0,
+            "y" : 16.0
           } ]
         },
         "visible" : true
       }, {
-        "id" : 23,
+        "id" : 7,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 8.0,
-            "y" : 12.0
-          }, {
-            "x" : 28.999999999999996,
-            "y" : 12.000000000000002
-          }, {
-            "x" : 29.0,
-            "y" : 0.5
-          }, {
-            "x" : 29.5,
-            "y" : 0.5
-          }, {
-            "x" : 29.5,
-            "y" : 19.5
-          }, {
-            "x" : 29.0,
-            "y" : 19.5
-          }, {
-            "x" : 3.0,
-            "y" : 19.5
-          }, {
-            "x" : 3.0,
-            "y" : 17.0
-          }, {
-            "x" : 3.2,
-            "y" : 16.0
-          }, {
-            "x" : 3.5,
-            "y" : 15.0
-          }, {
             "x" : 4.0,
-            "y" : 14.0
+            "y" : 11.0
           }, {
-            "x" : 5.0,
-            "y" : 13.1
+            "x" : 4.5,
+            "y" : 13.5
           }, {
-            "x" : 6.0,
-            "y" : 12.5
+            "x" : 6.5,
+            "y" : 15.5
+          }, {
+            "x" : 9.0,
+            "y" : 16.0
           } ]
+        },
+        "visible" : true
+      }, {
+        "id" : 8,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 4.5,
+            "y" : 13.5
+          }, {
+            "x" : 5.3,
+            "y" : 14.7
+          }, {
+            "x" : 6.5,
+            "y" : 15.5
+          } ]
+        },
+        "visible" : true
+      }, {
+        "id" : 3,
+        "shape" : {
+          "x" : 9.0,
+          "y" : 15.2,
+          "width" : 10.524959742351047,
+          "height" : 0.8000000000000007,
+          "type" : "RECTANGLE"
         },
         "visible" : true
       } ],
@@ -241,10 +222,10 @@
       "targets" : [ {
         "id" : 2,
         "shape" : {
-          "x" : 27.0,
+          "x" : 0.5,
           "y" : 0.5,
-          "width" : 2.0,
-          "height" : 1.5,
+          "width" : 3.4810341742708895,
+          "height" : 0.6000000000000001,
           "type" : "RECTANGLE"
         },
         "visible" : true,
@@ -267,10 +248,10 @@
       "sources" : [ {
         "id" : 1,
         "shape" : {
-          "x" : 1.0,
-          "y" : 19.0,
-          "width" : 2.0,
-          "height" : 0.5,
+          "x" : 18.0,
+          "y" : 15.951869744140275,
+          "width" : 1.5,
+          "height" : 3.548130255859725,
           "type" : "RECTANGLE"
         },
         "visible" : true,
@@ -279,7 +260,7 @@
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : -1,
           "constraintsTimeStart" : 0.0,
-          "constraintsTimeEnd" : 1000.0,
+          "constraintsTimeEnd" : 500.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
