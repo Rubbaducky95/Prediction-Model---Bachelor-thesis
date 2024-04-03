@@ -4,6 +4,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+/*
+* Functions for extracting the data as .txt files to use in MatLab
+*/
 
 public class ToTxt {
 
@@ -75,7 +78,7 @@ public class ToTxt {
         int totNrVRUs = vadereOutput.totalNrOfVRUs();
         double RMSE;
 
-        for(int i = 1; i <= totNrVRUs; i++) {
+        for (int i = 1; i <= totNrVRUs; i++) {
 
             ArrayList<Node> VRU = vadereOutput.getDataFor(i);
             output.append(i).append(" ");
@@ -96,7 +99,53 @@ public class ToTxt {
             directory.mkdirs();
         }
 
-        String filePath = directoryPath + "result_RMSE_allVRUs_dataPoint.txt";
+        String filePath;
+        if (flag == 1)
+            filePath = directoryPath + "result_RMSE_allVRUs_AutoDPs.txt";
+        else
+            filePath = directoryPath + "result_RMSE_allVRUs_" + noDataPoints + "DPs.txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void minMaxRMSEforVRUsWithSpecDataPoints(ReadOutput vadereOutput, double t, int noDataPoints, int flag) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("minRMSE maxRMSE\n");
+        int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Double> RMSE = new ArrayList<>();
+
+        for (int i = 1; i <= totNrVRUs; i++) {
+
+            ArrayList<Node> VRU = vadereOutput.getDataFor(i);
+            RMSE.add(Model.positionalRMSE(VRU, Model.getPredictionList(VRU, t, noDataPoints, flag)));
+            VRU.clear();
+        }
+
+        output.append(Collections.min(RMSE)).append(" ");
+        output.append(Collections.max(RMSE)).append("\n");
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath;
+        if (flag == 1)
+            filePath = directoryPath + "result_minMax_RMSE_allVRUs_AutoDPs.txt";
+        else
+            filePath = directoryPath + "result_minMax_RMSE_allVRUs_" + noDataPoints + "DPs.txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
