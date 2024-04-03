@@ -1,15 +1,12 @@
 import java.util.ArrayList;
 import org.apache.commons.math4.legacy.fitting.PolynomialCurveFitter;
 import org.apache.commons.math4.legacy.fitting.WeightedObservedPoints;
-
-
 /*
-
  * Handles all functions with lists of positions
  */
 public class Model {
 
-    public static int checkForChange(ArrayList<Node> nList){
+    public static int checkForChange(ArrayList<Node> nList){ //Return value will be what degree the polynomial regression model will use
 
         if(nList.size() < 2) //Too few nodes to use in prediction
             return 1;
@@ -21,19 +18,25 @@ public class Model {
             if (curPos.v - prevPos.v >= 0.5)
                 return 1; //We are accelerating, keep going straight.
             else if (curPos.v - prevPos.v <= -0.5)
-                return -1; //We are de-accelerating, we might turn.
+                return 2; //We are de-accelerating, we might turn.
             else
                 return 1; //No significant change, we keep going straight.
         }
 
         Node prevPrevPos = nList.get(nList.size()-3);
 
-        if(curPos.v - prevPos.v >= 0.5 || curPos.angleBetween(prevPos, prevPrevPos) <= 4)
+        if(curPos.v - prevPos.v >= 0.5 || curPos.angleBetween(prevPrevPos, prevPos) <= 4) {
             return 1; //We are accelerating, keep going straight.
-        else if(curPos.v - prevPos.v <= -0.5 || curPos.angleBetween(prevPos, prevPrevPos) > 4)
-            return -1; //We are de-accelerating, we might turn.
-        else
+        }
+        else if(curPos.v - prevPos.v <= -0.5 || curPos.angleBetween(prevPrevPos, prevPos) > 4) {
+            if (curPos.angleBetween(prevPrevPos, prevPos) > 60) {
+                return 3; //Big angle -> more DPs
+            }
+            return 2; //We are de-accelerating, we might turn.
+        }
+        else {
             return 1; //No significant change, we keep going straight.
+        }
     }
     public static double[] predictNextPosition(ArrayList<Node> n, double t, int noDataPoints) {
         //Input must be a list of all nodes up until the current position,
@@ -64,15 +67,20 @@ public class Model {
 
         return newPos;
     }
-    public static double[] predictionPolynomialRegression(ArrayList<Node> n, int degree, double simTime) {
+    public static double[] predictionPolynomialRegression(ArrayList<Node> n, int degree, double simTime, int useAngleCheck) {
 
         WeightedObservedPoints obsX = new WeightedObservedPoints();
         WeightedObservedPoints obsY = new WeightedObservedPoints();
 
+        if(useAngleCheck == 1) { //Use prediction model with automatic data point adjustment
+
+            degree = checkForChange(n);
+        }
+
         if(n.size() < degree + 1) { //If we have more data points to look at than there are nodes in the list we go here.
 
             //Number of data points to look at is limited to the size of the list
-            for(int i = 0; i < n.size(); i++) {
+            for (int i = 0; i < n.size(); i++) {
 
                 double t = n.get(i).timeStep / simTime;
                 double x = n.get(i).x;
@@ -81,7 +89,7 @@ public class Model {
                 obsY.add(t, y);
             }
 
-            PolynomialCurveFitter fitter = PolynomialCurveFitter.create(n.size()-1);
+            PolynomialCurveFitter fitter = PolynomialCurveFitter.create(n.size() - 1);
 
             double[] coX = fitter.fit(obsX.toList());
             double[] coY = fitter.fit(obsY.toList());
@@ -89,13 +97,13 @@ public class Model {
             double newX = 0;
             double newY = 0;
 
-            for(int i = 0; i < n.size(); i++) {
+            for (int i = 0; i < n.size(); i++) {
 
-                newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
-                newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+                newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep + 1) / simTime, i);
+                newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep + 1) / simTime, i);
             }
 
-            return new double[] {newX, newY};
+            return new double[]{newX, newY};
         }
 
         else { //Look at the number of data points we chose, and predict next position.
@@ -127,7 +135,7 @@ public class Model {
             return new double[] {newX, newY};
         }
     }
-    public static ArrayList<Node> getPredictionList(ArrayList<Node> nList, double t, int noOfDataPoints, int flag) {//0 for old prediction model, 1 for polynomial regression model
+    public static ArrayList<Node> getPredictionList(ArrayList<Node> nList, double t, int noOfDataPoints, int flag) {//flag = 0 for no angle check and 1 for checking angle
 
         ArrayList<Node> temp = new ArrayList<>();
         ArrayList<Node> predictionList = new ArrayList<>();
@@ -135,10 +143,7 @@ public class Model {
         Node tempNode;
         for(Node n : nList) {
             temp.add(n);
-            if(flag == 0)
-                predPos = predictNextPosition(temp,t,noOfDataPoints);
-            else if(flag == 1)
-                predPos = predictionPolynomialRegression(temp,noOfDataPoints-1,t);
+            predPos = predictionPolynomialRegression(temp,noOfDataPoints-1,t,flag);
             tempNode = new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v);
             predictionList.add(tempNode);
         }
