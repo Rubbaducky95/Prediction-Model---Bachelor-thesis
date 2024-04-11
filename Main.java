@@ -11,11 +11,13 @@ import java.util.Collections;
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
-        String filePath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\Simulations\\Test\\output\\";
-        String fileName = "Real_traffic_scenario_0.9s_50VRUs";
+        String filePath = "C:\\Users\\ruben\\OneDrive\\Dokument\\Högskolan\\DCTVT24\\EXAMENS ARBETE\\Simulation\\Simulations\\Test\\output\\";
+        String fileName = "S-turn_0.9s_10VRUs";
         ReadOutput whatToRead = new ReadOutput(filePath + fileName);
 
-        //oTxt.actualPositionsForVRU(whatToRead,4);
+
+        ToTxt.actualPositionsForVRU(whatToRead,1);
+        ToTxt.APFPForVRU(whatToRead,0.9,2,1);
 
         //ToTxt.predictedPositionsForVRU(whatToRead,0.9,2,1,0);
         //ToTxt.predictedPositionsForVRU(whatToRead,0.9,3,1,0);
@@ -31,10 +33,10 @@ public class Main {
         ToTxt.predictedMeanPositionsForVRU(whatToRead,0.9,4,4);
         ToTxt.predictedMeanPositionsForVRU(whatToRead,0.9,5,4);*/
 
-        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 2);
+        /*ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 2);
         ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 3);
         ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 4);
-        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 5);
+        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 5);*/
 
 //      ToTxt.RMSEforVRUsWithSpecDataPoints(whatToRead,0.9,2,0);
 //      ToTxt.RMSEforVRUsWithSpecDataPoints(whatToRead,0.9,3,0);
