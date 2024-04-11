@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import org.apache.commons.math4.legacy.fitting.PolynomialCurveFitter;
 import org.apache.commons.math4.legacy.fitting.WeightedObservedPoints;
 /*
- * Handles all functions with lists of positions
+ * Handles all functions with lists of positions.
  */
 public class Model {
 
@@ -38,6 +38,7 @@ public class Model {
             return 1; //No significant change, we keep going straight.
         }
     }
+    //Check if we have a certain change in velocity, distance and angle.
     public static double[] predictNextPosition(ArrayList<Node> n, double t, int noDataPoints) {
         //Input must be a list of all nodes up until the current position,
         // what time we simulate with between each timestep,
@@ -67,6 +68,7 @@ public class Model {
 
         return newPos;
     }
+    //Old prediction model.
     public static double[] predictionPolynomialRegression(ArrayList<Node> n, int degree, double simTime, int useAngleCheck) {
 
         WeightedObservedPoints obsX = new WeightedObservedPoints();
@@ -135,7 +137,8 @@ public class Model {
             return new double[] {newX, newY};
         }
     }
-    public static ArrayList<Node> getPredictionList(ArrayList<Node> nList, double t, int noOfDataPoints, int flag) {//flag = 0 for no angle check and 1 for checking angle
+    //Prediction using polynomial regression. Can either have an automatic datapoint changer activated or a set no. data points.
+    public static ArrayList<Node> getPredictionList(ArrayList<Node> nList, double t, int noDataPoints, int flag) {//flag = 0 for no angle check and 1 for checking angle
 
         ArrayList<Node> temp = new ArrayList<>();
         ArrayList<Node> predictionList = new ArrayList<>();
@@ -143,11 +146,12 @@ public class Model {
         for(Node n : nList) {
 
             temp.add(n);
-            double[] predPos = predictionPolynomialRegression(temp,noOfDataPoints-1,t,flag);
+            double[] predPos = predictionPolynomialRegression(temp,noDataPoints-1,t,flag);
             predictionList.add(new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v));
         }
         return predictionList;
     }
+    //Return a list containing predicted positions.
     public static ArrayList<Node> getMeanPredictionList(ArrayList<Node> nList, double t, int n) {
 
         //Return the mean coordinate for n-1 no. of coordinates
@@ -171,6 +175,35 @@ public class Model {
         }
         return predictionList;
     }
+    //Return a list containing the mean predicted position of n to 2 datapoint predictions.
+    public static ArrayList<APFP> getAPFPList(ArrayList<Node> nList, double t, int noDataPoints, int flag) {
+
+        ArrayList<Node> temp = new ArrayList<>();
+        ArrayList<APFP> APFPList = new ArrayList<>();
+        Node prevPos = new Node(0,0,0,0,0);
+        Node prevPrevPos = new Node(0,0,0,0,0);
+
+        for(Node n : nList) {
+
+            temp.add(n);
+            double[] predCord = predictionPolynomialRegression(temp,noDataPoints-1,t,flag);
+            Node predPos = new Node(n.timeStep+1,n.id,predCord[0],predCord[1],n.v);
+            if(temp.size() >= 3) {
+                //double posX = n.x + n.distanceBetween(predPos) * Math.cos(n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180);
+                //double posY = n.y + n.distanceBetween(predPos) * Math.sin(n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180);
+                double angle = n.angleBetween(prevPrevPos, prevPos);
+                double posX = n.x + n.distanceBetween(predPos) * Math.sin((90-angle) / 2 * Math.PI / 180);
+                double posY = n.y + n.distanceBetween(predPos) * Math.cos((90-angle) / 2 * Math.PI / 180);
+                double negX = n.x + n.distanceBetween(predPos) * Math.cos((90-angle) / 2 * Math.PI / 180);
+                double negY = n.y + n.distanceBetween(predPos) * Math.sin((90-angle) / 2 * Math.PI / 180);
+                APFPList.add(new APFP(n,predPos,posX,posY,negX,negY,angle));
+            }
+            prevPrevPos = prevPos;
+            prevPos = n;
+        }
+        return APFPList;
+    }
+    //Returns APFP with coordinates for edge points of are and angle. Does not use the mean-poly-reg prediction model as of now...
     public static double[] coordinateRMSE(ArrayList<Node> actualPos, ArrayList<Node> predictedPos, double t, int noDataPoints) { //flag: 0 for the old way, 1 for polynomial regression
 
         double RMSEx = 0;
@@ -186,6 +219,7 @@ public class Model {
 
         return new double[]{RMSEx, RMSEy};
     }
+    //Return RMSE for both x and y.
     public static double positionalRMSE(ArrayList<Node> actualPos, ArrayList<Node> predictedPos) { //0 for old prediction model, 1 for polynomial prograssion model
 
         Node tempNode;
@@ -200,6 +234,7 @@ public class Model {
 
         return Math.sqrt(RMSE / actualPos.size());
     }
+    //Return the difference in distance RMSE.
     public static ArrayList<Double> getDifferenceInDistanceList(ArrayList<Node> actualPos, ArrayList<Node> predictedPos) {
 
         ArrayList<Double> diffList = new ArrayList<>();
@@ -210,4 +245,5 @@ public class Model {
         }
         return diffList;
     }
+    //Return an array of differences in distance between actual and predicted position for all positions.
 }
