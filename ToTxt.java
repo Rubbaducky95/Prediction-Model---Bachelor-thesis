@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 /*
-* Functions for extracting the data as .txt files to use in MatLab
-*/
+ * Functions for extracting the data as .txt files to use in MatLab
+ */
 
 public class ToTxt {
 
@@ -22,22 +22,22 @@ public class ToTxt {
             ArrayList<Node> VRU = vadereOutput.getDataFor(i);
             output.append(i).append(" ");
             for(int j = 1; j < 10; j++) {
-            RMSE.add(Model.positionalRMSE(VRU, Model.getPredictionList(VRU, t, j, flag)));
+                RMSE.add(Model.positionalRMSE(VRU, Model.getPredictionList(VRU, t, j, flag)));
             }
 
-        minRMSE = Collections.min(RMSE);
-        output.append((1+RMSE.indexOf(minRMSE))).append(" ");
-        output.append(minRMSE).append("\n");
-        RMSE.clear();
-        VRU.clear();
+            minRMSE = Collections.min(RMSE);
+            output.append((1+RMSE.indexOf(minRMSE))).append(" ");
+            output.append(minRMSE).append("\n");
+            RMSE.clear();
+            VRU.clear();
         }
 
         try {
-        FileWriter writer = new FileWriter("result_minRMSE.txt");
-        writer.write(String.valueOf(output));
-        writer.close();
+            FileWriter writer = new FileWriter("result_minRMSE.txt");
+            writer.write(String.valueOf(output));
+            writer.close();
         } catch (
-        IOException e) {
+                IOException e) {
             e.printStackTrace();
         }
     }
@@ -387,10 +387,53 @@ public class ToTxt {
             e.printStackTrace();
         }
     }
+    public static void APFPForVRU(ReadOutput vadereOutput, double t, int noDataPoints, int VRUid) throws FileNotFoundException {
+
+
+        StringBuilder output = new StringBuilder("currPosX currPosY predPosX predPosY posX posY negX negY angle\n");
+        ArrayList<Node> actualPositions = vadereOutput.getDataFor(VRUid);
+        ArrayList<APFP> APFPforVRU = Model.getAPFPList(actualPositions,t,noDataPoints,0);
+
+        for(APFP a : APFPforVRU) {
+
+            output.append(a.currPos.x).append(" ");
+            output.append(a.currPos.y).append(" ");
+            output.append(a.predPos.x).append(" ");
+            output.append(a.predPos.y).append(" ");
+            output.append(a.posX).append(" ");
+            output.append(a.posY).append(" ");
+            output.append(a.negX).append(" ");
+            output.append(a.negY).append(" ");
+            output.append(a.angle).append("\n");
+        }
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Dokument\\Högskolan\\DCTVT24\\EXAMENS ARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath = directoryPath + "APFP_VRU" + VRUid + ".txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public static void differenceListForAllVRUs(ReadOutput vadereOutput, double t, int noDataPoints, int flag) throws FileNotFoundException {
 
         StringBuilder output = new StringBuilder("Differences in distance:\n");
         int totNrVRUs = vadereOutput.totalNrOfVRUs();
+
         double distanceBetween;
 
         for(int i = 0; i < totNrVRUs; i++) {
