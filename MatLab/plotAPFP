@@ -1,0 +1,21 @@
+APFP = readmatrix('APFP_VRU1.txt');
+xC = APFP(:,1);
+yC = APFP(:,2);
+xP = APFP(:,3);
+yP = APFP(:,4);
+posX = APFP(:,5);
+posY = APFP(:,6);
+negX = APFP(:,7);
+negY = APFP(:,8);
+
+plot(xC,yC,'-o','LineWidth',1);
+hold on;
+plot(xP,yP,'-x');
+plot(posX,posY);
+plot(negX,negY);
+hold off;
+title('APFP for VRU. Scenario: S-turn');
+ylabel('y-position');
+xlabel('x-position');
+legend('Location','northeast');
+legend('Actual pos','Predited pos','Positive edgep','Negative edgep');
