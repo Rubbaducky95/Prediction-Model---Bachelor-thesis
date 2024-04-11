@@ -12,18 +12,37 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         String filePath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\Simulations\\Test\\output\\";
-        String fileName = "S-turn_0.9s_50VRUs";
+        String fileName = "Real_traffic_scenario_0.9s_50VRUs";
         ReadOutput whatToRead = new ReadOutput(filePath + fileName);
 
-        //ToTxt.differenceListForAllVRUs(whatToRead,0.9,3,1);
-        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,2,1,1);
-        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,3,1,1);
-        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,4,1,1);
-        //ToTxt.actualPositionsForVRU(whatToRead,1);
-        //ToTxt.RMSEforVRUsWithSpecDataPoints(whatToRead,0.9,2,1);
-        ToTxt.minMaxRMSEforDataPoints(whatToRead,0.9,2,6,1);
+        //oTxt.actualPositionsForVRU(whatToRead,4);
 
-        /*ArrayList<Node> VRU = whatToRead.getDataFor(1);
+        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,2,1,0);
+        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,3,1,0);
+        //ToTxt.predictedPositionsForVRU(whatToRead,0.9,0,1,1);
+
+        /*ToTxt.minMaxRMSEforVRUsWithSpecDataPoints(whatToRead,0.9,2,0);
+        ToTxt.minMaxRMSEforVRUsWithSpecDataPoints(whatToRead,0.9,3,0);
+        ToTxt.minMaxRMSEforVRUsWithSpecDataPoints(whatToRead,0.9,0,1);
+        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead,0.9);*/
+
+        /*ToTxt.predictedMeanPositionsForVRU(whatToRead,0.9,2,4);
+        ToTxt.predictedMeanPositionsForVRU(whatToRead,0.9,3,4);
+        ToTxt.predictedMeanPositionsForVRU(whatToRead,0.9,4,4);
+        ToTxt.predictedMeanPositionsForVRU(whatToRead,0.9,5,4);*/
+
+        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 2);
+        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 3);
+        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 4);
+        ToTxt.minMaxRMSEforVRUsWithMeanPrediction(whatToRead, 0.9, 5);
+
+//      ToTxt.RMSEforVRUsWithSpecDataPoints(whatToRead,0.9,2,0);
+//      ToTxt.RMSEforVRUsWithSpecDataPoints(whatToRead,0.9,3,0);
+//      ToTxt.RMSEforVRUsWithSpecDataPoints(whatToRead,0.9,0,1);
+        //ToTxt.differenceListForAllVRUs(whatToRead,0.9,3,1);
+        //ToTxt.minMaxRMSEforDataPoints(whatToRead,0.9,2,6,1);
+
+        /*ArrayList<Node> VRU = whatToRead.getDataFor(2);
 
         Node n1 = VRU.get(0);
         Node n2 = VRU.get(1);
@@ -46,27 +65,15 @@ public class Main {
         System.out.println(angles);
         System.out.println(changeFlags);*/
 
+//        ArrayList<ArrayList<Node>> listOfNodeLists = new ArrayList<>();
+//        listOfNodeLists.add(whatToRead.getDataFor(2));
+//        listOfNodeLists.add(Model.getPredictionList(listOfNodeLists.get(0),0.9,0,1));
+//
+//        SwingUtilities.invokeLater(() -> {
+//            MainFrame frame = new MainFrame(listOfNodeLists, 20.0);
+//            frame.setVisible(true);
+//        });
 
-
-/*
-            for (int i = 1; i < VRU.size(); i++)
-                System.out.println(VRU.get(i) + " " + newpredictionVRU.get(i-1));
-
-            System.out.println(Model.positionalRMSE(VRU,oldpredictionVRU));
-            System.out.println(Model.positionalRMSE(VRU,newpredictionVRU));
-
-
- */
-/*
-            ArrayList<ArrayList<Node>> listOfNodeLists = new ArrayList<>();
-            listOfNodeLists.add(whatToRead.getDataFor(10));
-            listOfNodeLists.add(Model.getPredictionList(listOfNodeLists.get(0),0.5,3,1));
-
-            SwingUtilities.invokeLater(() -> {
-                MainFrame frame = new MainFrame(listOfNodeLists, 20.0);
-                frame.setVisible(true);
-            });
-            */
 
     }
 }
