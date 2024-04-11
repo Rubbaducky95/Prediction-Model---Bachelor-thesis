@@ -139,13 +139,35 @@ public class Model {
 
         ArrayList<Node> temp = new ArrayList<>();
         ArrayList<Node> predictionList = new ArrayList<>();
-        double[] predPos = new double[2];
-        Node tempNode;
+
         for(Node n : nList) {
+
             temp.add(n);
-            predPos = predictionPolynomialRegression(temp,noOfDataPoints-1,t,flag);
-            tempNode = new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v);
-            predictionList.add(tempNode);
+            double[] predPos = predictionPolynomialRegression(temp,noOfDataPoints-1,t,flag);
+            predictionList.add(new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v));
+        }
+        return predictionList;
+    }
+    public static ArrayList<Node> getMeanPredictionList(ArrayList<Node> nList, double t, int n) {
+
+        //Return the mean coordinate for n-1 no. of coordinates
+        ArrayList<Node> temp = new ArrayList<>();
+        ArrayList<Node> predictionList = new ArrayList<>();
+        double[] predPosMean = {0.0, 0.0};
+
+        for(Node node : nList) {
+
+            temp.add(node);
+            for(int i = 1; i < n; i++) {
+                double[] predPos = predictionPolynomialRegression(temp, n - i, t, 0);   //Look at  data points
+                predPosMean[0] += predPos[0];
+                predPosMean[1] += predPos[1];
+            }
+            predPosMean[0] /= (n-1);
+            predPosMean[1] /= (n-1);
+            predictionList.add(new Node(node.timeStep + 1, node.id, predPosMean[0], predPosMean[1], node.v));
+            predPosMean[0] = 0;
+            predPosMean[1] = 0;
         }
         return predictionList;
     }
