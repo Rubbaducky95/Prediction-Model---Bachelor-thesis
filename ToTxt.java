@@ -155,6 +155,46 @@ public class ToTxt {
             e.printStackTrace();
         }
     }
+    public static void minMaxRMSEforVRUsWithMeanPrediction(ReadOutput vadereOutput, double t, int noDataPoints) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("minRMSE maxRMSE\n");
+        int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Double> RMSE = new ArrayList<>();
+
+        for (int i = 1; i <= totNrVRUs; i++) {
+
+            ArrayList<Node> VRU = vadereOutput.getDataFor(i);
+            RMSE.add(Model.positionalRMSE(VRU, Model.getMeanPredictionList(VRU,t,noDataPoints)));
+            VRU.clear();
+        }
+
+        output.append(Collections.min(RMSE)).append(" ");
+        output.append(Collections.max(RMSE)).append("\n");
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath;
+
+        filePath = directoryPath + "result_minMax_RMSE_MeanPred_" + noDataPoints + "DPs.txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public static void minMaxRMSEforDataPoints(ReadOutput vadereOutput, double t, int lowerLimitDP, int upperLimitDP, int flag) throws FileNotFoundException {
 
         StringBuilder output = new StringBuilder("no.DataPoints minRMSE maxRMSE\n");
@@ -267,6 +307,41 @@ public class ToTxt {
         }
 
         String filePath = directoryPath + "result_predPos_" + noDataPoints + "DPs_" + "VRU" + VRUid + ".txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void predictedMeanPositionsForVRU(ReadOutput vadereOutput, double t, int noDataPoints, int VRUid) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("timeStep VRUID x-position y-position\n");
+        ArrayList<Node> predictedPositions = Model.getMeanPredictionList(vadereOutput.getDataFor(VRUid),t, noDataPoints);
+
+        for(Node n : predictedPositions) {
+
+            output.append(n.timeStep).append(" ");
+            output.append(n.id).append(" ");
+            output.append(n.x).append(" ");
+            output.append(n.y).append("\n");
+        }
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath = directoryPath + "result_predMeanPos_from" + noDataPoints + "to2DPs_VRU" + VRUid + ".txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
