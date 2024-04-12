@@ -180,8 +180,8 @@ public class Model {
 
         ArrayList<Node> temp = new ArrayList<>();
         ArrayList<APFP> APFPList = new ArrayList<>();
-        Node prevPos = new Node(0,0,0,0,0);
-        Node prevPrevPos = new Node(0,0,0,0,0);
+        Node prevPos = nList.get(0);
+        Node prevPrevPos = nList.get(0);
 
         for(Node n : nList) {
 
@@ -189,15 +189,20 @@ public class Model {
             double[] predCord = predictionPolynomialRegression(temp,noDataPoints-1,t,flag);
             Node predPos = new Node(n.timeStep+1,n.id,predCord[0],predCord[1],n.v);
             if(temp.size() >= 3) {
-                //double posX = n.x + n.distanceBetween(predPos) * Math.cos(n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180);
-                //double posY = n.y + n.distanceBetween(predPos) * Math.sin(n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180);
-                double angle = n.angleBetween(prevPrevPos, prevPos);
-                double posX = n.x + n.distanceBetween(predPos) * Math.sin((90-angle) / 2 * Math.PI / 180);
-                double posY = n.y + n.distanceBetween(predPos) * Math.cos((90-angle) / 2 * Math.PI / 180);
-                double negX = n.x + n.distanceBetween(predPos) * Math.cos((90-angle) / 2 * Math.PI / 180);
-                double negY = n.y + n.distanceBetween(predPos) * Math.sin((90-angle) / 2 * Math.PI / 180);
+
+                double angle = n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180; //In radians
+
+                double[] CP = {predPos.x-n.x, predPos.y-n.y}; //CP[0] = v_x, CP[1] = v_y
+                double posX = n.x + CP[0] * Math.cos(angle) - CP[1] * Math.sin(angle);
+                double posY = n.y + CP[0] * Math.sin(angle) + CP[1] * Math.cos(angle);
+                double negX = n.x + CP[0] * Math.cos(-angle) - CP[1] * Math.sin(-angle);
+                double negY = n.y + CP[0] * Math.sin(-angle) + CP[1] * Math.cos(-angle);
+
                 APFPList.add(new APFP(n,predPos,posX,posY,negX,negY,angle));
             }
+            else
+                APFPList.add(new APFP(n,predPos,predPos.x,predPos.y,predPos.x,predPos.y,0));
+
             prevPrevPos = prevPos;
             prevPos = n;
         }
