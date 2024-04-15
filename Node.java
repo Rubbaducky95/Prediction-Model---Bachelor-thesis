@@ -1,7 +1,7 @@
 import java.util.Comparator;
 /*
-* Handles all Node functions
-* */
+ * Handles all Node functions
+ * */
 public class Node implements Comparable<Node>{
 
     int timeStep;
@@ -24,26 +24,6 @@ public class Node implements Comparable<Node>{
         return Integer.compare(this.timeStep, o.timeStep);
     }
 
-    public int getId(){
-        return id;
-    }
-
-    public int getTimeStep(){
-        return timeStep;
-    }
-
-    public double getX(){
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getV() {
-        return v;
-    }
-
     public double distanceBetween(Node n) {
 
         return Math.sqrt(Math.pow(this.x - n.x,2) + Math.pow(this.y-n.y,2));
@@ -60,8 +40,7 @@ public class Node implements Comparable<Node>{
         double vectorY = n.y - this.y;
 
         //Determine what quadrant the vector lies in
-        double angle = Math.atan(vectorY / vectorX) * 180 / Math.PI;
-        return angle;
+        return Math.atan(vectorY / vectorX) * 180 / Math.PI;
     }
 
     public double angleBetween(Node n1, Node n2) { //"this" is current node, n1 is two nodes back, and n2 is previous node.
@@ -78,9 +57,9 @@ public class Node implements Comparable<Node>{
     }
 
     public String toString(){
-        return "\n" + "Time step: " + getTimeStep() +
-                " ID: " + getId() + "\n" +
-                "X: " + getX() + ", Y: " + getY() + "\n" +
-                "Velocity: " + getV();
+        return "\n" + "Time step: " + timeStep +
+                " ID: " + id + "\n" +
+                "X: " + x + ", Y: " + y + "\n" +
+                "Velocity: " + v;
     }
 }
