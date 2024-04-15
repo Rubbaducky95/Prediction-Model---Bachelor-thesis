@@ -12,12 +12,11 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         String filePath = "C:\\Users\\ruben\\OneDrive\\Dokument\\Högskolan\\DCTVT24\\EXAMENS ARBETE\\Simulation\\Simulations\\Test\\output\\";
-        String fileName = "S-turn_0.9s_10VRUs";
+        String fileName = "Z-turn_0.9s_100VRUs";
         ReadOutput whatToRead = new ReadOutput(filePath + fileName);
 
-
-        ToTxt.actualPositionsForVRU(whatToRead,1);
-        ToTxt.APFPForVRU(whatToRead,0.9,2,1);
+        ToTxt.actualPositionsForVRU(whatToRead,3);
+        ToTxt.APFPForVRU(whatToRead,0.9,3,3);
 
         //ToTxt.predictedPositionsForVRU(whatToRead,0.9,2,1,0);
         //ToTxt.predictedPositionsForVRU(whatToRead,0.9,3,1,0);
