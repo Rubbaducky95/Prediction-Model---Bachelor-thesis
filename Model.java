@@ -190,15 +190,26 @@ public class Model {
             Node predPos = new Node(n.timeStep+1,n.id,predCord[0],predCord[1],n.v);
             if(temp.size() >= 3) {
 
-                double angle = n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180; //In radians
+                double theta = n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180; //In radians
+                if(checkForChange(temp) > 1)
+                    theta = theta * 2;
+
+                /*double omega = n.directionOfVector(prevPos) * Math.PI / 180;
+                double r = n.distanceBetween(predPos);
+                double posX = n.x + r * (Math.cos(omega) * Math.cos(theta) - Math.sin(omega) * Math.sin(theta));
+                double posY = n.y + r * (Math.sin(omega) * Math.cos(theta) + Math.cos(omega) * Math.sin(theta));
+                double negX = n.x + r * (Math.cos(omega) * Math.cos(theta) - Math.sin(omega) * Math.sin(theta));
+                double negY = n.y + r * (Math.sin(omega) * Math.cos(theta) - Math.cos(omega) * Math.sin(theta));*/
+
 
                 double[] CP = {predPos.x-n.x, predPos.y-n.y}; //CP[0] = v_x, CP[1] = v_y
-                double posX = n.x + CP[0] * Math.cos(angle) - CP[1] * Math.sin(angle);
-                double posY = n.y + CP[0] * Math.sin(angle) + CP[1] * Math.cos(angle);
-                double negX = n.x + CP[0] * Math.cos(-angle) - CP[1] * Math.sin(-angle);
-                double negY = n.y + CP[0] * Math.sin(-angle) + CP[1] * Math.cos(-angle);
+                double posX = n.x + CP[0] * Math.cos(theta) - CP[1] * Math.sin(theta);
+                double posY = n.y + CP[0] * Math.sin(theta) + CP[1] * Math.cos(theta);
+                double negX = n.x + CP[0] * Math.cos(-theta) - CP[1] * Math.sin(-theta);
+                double negY = n.y + CP[0] * Math.sin(-theta) + CP[1] * Math.cos(-theta);
 
-                APFPList.add(new APFP(n,predPos,posX,posY,negX,negY,angle));
+
+                APFPList.add(new APFP(n,predPos,posX,posY,negX,negY,theta * 180 / Math.PI));
             }
             else
                 APFPList.add(new APFP(n,predPos,predPos.x,predPos.y,predPos.x,predPos.y,0));
