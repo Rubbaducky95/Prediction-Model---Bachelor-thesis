@@ -48,6 +48,13 @@ public class Node implements Comparable<Node>{
         return Math.abs(n1.directionOfVector(n2) - n2.directionOfVector(this));
     }
 
+    public String direction(Node n1, Node n2) { //"this" is predicted position, n1 is current position, and n2 is previous position
+
+        if(this.angleBetween(n2,n1) < 4)
+            return "Straight";
+        return (n2.directionOfVector(n1) > n1.directionOfVector(this)) ? "Right" : "Left";
+    }
+
     public double getVx(Node n) { //Input is the current position
         return n.v * Math.cos(this.directionOfVector(n));
     }
@@ -61,5 +68,9 @@ public class Node implements Comparable<Node>{
                 " ID: " + id + "\n" +
                 "X: " + x + ", Y: " + y + "\n" +
                 "Velocity: " + v;
+    }
+
+    public double getAcceleration(Node n, double t) { //"this" is current node, n is previous node
+        return (this.v - n.v) / t;
     }
 }
