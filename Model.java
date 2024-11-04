@@ -138,6 +138,78 @@ public class Model {
         }
     }
     //Prediction using polynomial regression. Can either have an automatic datapoint changer activated or a set no. data points.
+    public static double[] weightedPredictionPolynomialRegression(ArrayList<Node> n, int degree, double simTime, int useAngleCheck, double weight) {
+
+        WeightedObservedPoints obsX = new WeightedObservedPoints();
+        WeightedObservedPoints obsY = new WeightedObservedPoints();
+
+        if(useAngleCheck == 1) { //Use prediction model with automatic data point adjustment
+
+            degree = checkForChange(n);
+        }
+
+        if(n.size() < degree + 1) { //If we have more data points to look at than there are nodes in the list we go here.
+
+            weight = weight / n.size();
+            //Number of data points to look at is limited to the size of the list
+            for (int i = 0; i < n.size(); i++) {
+
+                double t = n.get(i).timeStep / simTime;
+                double x = n.get(i).x;
+                double y = n.get(i).y;
+                obsX.add(weight, t, x);
+                obsY.add(weight, t, y);
+                weight += weight / n.size();
+            }
+
+            PolynomialCurveFitter fitter = PolynomialCurveFitter.create(n.size() - 1);
+
+            double[] coX = fitter.fit(obsX.toList());
+            double[] coY = fitter.fit(obsY.toList());
+
+            double newX = 0;
+            double newY = 0;
+
+            for (int i = 0; i < n.size(); i++) {
+
+                newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep + 1) / simTime, i);
+                newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep + 1) / simTime, i);
+            }
+
+            return new double[]{newX, newY};
+        }
+
+        else { //Look at the number of data points we chose, and predict next position.
+            weight = weight / (degree + 1);
+            //Number of data points we look at is "degree" + 1.
+            for (int i = 0; i < degree + 1; i++) {
+
+                double t = n.get(n.size() - degree - 1 + i).timeStep / simTime;
+                double x = n.get(n.size() - degree - 1 + i).x;
+                double y = n.get(n.size() - degree - 1 + i).y;
+                obsX.add(weight, t, x);
+                obsY.add(weight, t, y);
+                weight += weight / (degree + 1);
+            }
+
+            PolynomialCurveFitter fitter = PolynomialCurveFitter.create(degree);
+
+            double[] coX = fitter.fit(obsX.toList());
+            double[] coY = fitter.fit(obsY.toList());
+
+            double newX = 0;
+            double newY = 0;
+
+            for(int i = 0; i < degree + 1; i++) {
+
+                newX += coX[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+                newY += coY[i] * Math.pow(((double) n.get(n.size() - 1).timeStep+1) / simTime, i);
+            }
+
+            return new double[] {newX, newY};
+        }
+    }
+    //Prediction using polynomial regression. Can either have an automatic datapoint changer activated or a set no. data points.
     public static ArrayList<Node> getPredictionList(ArrayList<Node> nList, double t, int noDataPoints, int flag) {//flag = 0 for no angle check and 1 for checking angle
 
         ArrayList<Node> temp = new ArrayList<>();
@@ -147,6 +219,20 @@ public class Model {
 
             temp.add(n);
             double[] predPos = predictionPolynomialRegression(temp,noDataPoints-1,t,flag);
+            predictionList.add(new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v));
+        }
+        return predictionList;
+    }
+    //Return a list containing predicted positions.
+    public static ArrayList<Node> getWeightedPredictionList(ArrayList<Node> nList, double t, int noDataPoints, int flag, double weight) {//flag = 0 for no angle check and 1 for checking angle
+
+        ArrayList<Node> temp = new ArrayList<>();
+        ArrayList<Node> predictionList = new ArrayList<>();
+
+        for(Node n : nList) {
+
+            temp.add(n);
+            double[] predPos = weightedPredictionPolynomialRegression(temp,noDataPoints-1,t,flag,weight);
             predictionList.add(new Node(n.timeStep+1,n.id,predPos[0],predPos[1],n.v));
         }
         return predictionList;
@@ -176,50 +262,100 @@ public class Model {
         return predictionList;
     }
     //Return a list containing the mean predicted position of n to 2 datapoint predictions.
-    public static ArrayList<APFP> getAPFPList(ArrayList<Node> nList, double t, int noDataPoints, int flag) {
+    public static ArrayList<Node> getWeightedMeanPredictionList(ArrayList<Node> nList, double t, int n, double weight) {
+
+        //Return the mean coordinate for n-1 no. of coordinates
+        ArrayList<Node> temp = new ArrayList<>();
+        ArrayList<Node> predictionList = new ArrayList<>();
+        double[] predPosMean = {0.0, 0.0};
+
+        for(Node node : nList) {
+
+            temp.add(node);
+            for(int i = 1; i < n; i++) {
+                double[] predPos = weightedPredictionPolynomialRegression(temp, n - i, t, 0, weight);   //Look at  data points
+                predPosMean[0] += predPos[0];
+                predPosMean[1] += predPos[1];
+            }
+            predPosMean[0] /= (n-1);
+            predPosMean[1] /= (n-1);
+            predictionList.add(new Node(node.timeStep + 1, node.id, predPosMean[0], predPosMean[1], node.v));
+            predPosMean[0] = 0;
+            predPosMean[1] = 0;
+        }
+        return predictionList;
+    }
+    //Return a list containing the mean predicted position of n to 2 datapoint predictions.
+    public static ArrayList<APFP> getAPFPList(ArrayList<Node> nList, double t, int noDataPoints, int flag) { //flag = 0 for normal, = 1 for angle check, = 2 for mean
 
         ArrayList<Node> temp = new ArrayList<>();
         ArrayList<APFP> APFPList = new ArrayList<>();
         Node prevPos = nList.get(0);
-        Node prevPrevPos = nList.get(0);
+        Node prevPrevPos = nList.get(0);a
+        Node predPos;
+        double[] predPosMean = {0.0, 0.0};
 
-        for(Node n : nList) {
+        for (Node n : nList) {
 
             temp.add(n);
-            double[] predCord = predictionPolynomialRegression(temp,noDataPoints-1,t,flag);
-            Node predPos = new Node(n.timeStep+1,n.id,predCord[0],predCord[1],n.v);
-            if(temp.size() >= 3) {
+            if(flag == 2) {
+                for(int i = 1; i < noDataPoints; i++) {
+                    double[] predCord = predictionPolynomialRegression(temp, noDataPoints - i, t, 0);   //Look at  data points
+                    predPosMean[0] += predCord[0];
+                    predPosMean[1] += predCord[1];
+                }
+                predPosMean[0] /= (noDataPoints-1);
+                predPosMean[1] /= (noDataPoints-1);
+                predPos = new Node(n.timeStep + 1, n.id, predPosMean[0], predPosMean[1], n.v);
+                predPosMean[0] = 0;
+                predPosMean[1] = 0;
+            }
 
-                double theta = n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180; //In radians
-                if(checkForChange(temp) > 1)
-                    theta = theta * 2;
+            else {
+                double[] predCord = predictionPolynomialRegression(temp, noDataPoints - 1, t, flag);
+                predPos = new Node(n.timeStep + 1, n.id, predCord[0], predCord[1], n.v);
+            }
 
-                /*double omega = n.directionOfVector(prevPos) * Math.PI / 180;
+            if (temp.size() >= 3) {
+
+                double theta = n.angleBetween(prevPrevPos, prevPos) * Math.PI / 180; // In radians
+                if (checkForChange(temp) == 3)
+                    theta = theta   * 2;//If we want to factor theta to encompass a larger area when a big turn is coming
+
+                double omega = n.directionOfVector(predPos) * Math.PI / 180;
                 double r = n.distanceBetween(predPos);
                 double posX = n.x + r * (Math.cos(omega) * Math.cos(theta) - Math.sin(omega) * Math.sin(theta));
                 double posY = n.y + r * (Math.sin(omega) * Math.cos(theta) + Math.cos(omega) * Math.sin(theta));
-                double negX = n.x + r * (Math.cos(omega) * Math.cos(theta) - Math.sin(omega) * Math.sin(theta));
-                double negY = n.y + r * (Math.sin(omega) * Math.cos(theta) - Math.cos(omega) * Math.sin(theta));*/
+                double negX = n.x + r * (Math.cos(omega) * Math.cos(theta) + Math.sin(omega) * Math.sin(theta));
+                double negY = n.y + r * (Math.sin(omega) * Math.cos(theta) - Math.cos(omega) * Math.sin(theta));
 
+                String direction = predPos.direction(n, prevPos);
 
-                double[] CP = {predPos.x-n.x, predPos.y-n.y}; //CP[0] = v_x, CP[1] = v_y
-                double posX = n.x + CP[0] * Math.cos(theta) - CP[1] * Math.sin(theta);
-                double posY = n.y + CP[0] * Math.sin(theta) + CP[1] * Math.cos(theta);
-                double negX = n.x + CP[0] * Math.cos(-theta) - CP[1] * Math.sin(-theta);
-                double negY = n.y + CP[0] * Math.sin(-theta) + CP[1] * Math.cos(-theta);
-
-
-                APFPList.add(new APFP(n,predPos,posX,posY,negX,negY,theta * 180 / Math.PI));
-            }
-            else
-                APFPList.add(new APFP(n,predPos,predPos.x,predPos.y,predPos.x,predPos.y,0));
+                APFPList.add(new APFP(n, predPos, posX, posY, negX, negY, theta * 180 / Math.PI, direction));
+            } else
+                APFPList.add(new APFP(n, predPos, predPos.x, predPos.y, predPos.x, predPos.y, 0, "Straight"));
 
             prevPrevPos = prevPos;
             prevPos = n;
         }
         return APFPList;
     }
-    //Returns APFP with coordinates for edge points of are and angle. Does not use the mean-poly-reg prediction model as of now...
+    // Returns APFP with coordinates for edge points and angle.
+    public static ArrayList<String> directionList(ArrayList<Node> actualPos, ArrayList<Node> predPos) {
+
+        return null;
+    }
+    public static double getAccuracy(ArrayList<APFP> APFPList) {
+        int noFalse = 0;
+        int noTrue = 0;
+        for(int i = 0; i < APFPList.size()-1; i++) {
+
+            if (APFPList.get(i).contains(APFPList.get(i+1).currPos))
+                noTrue++;
+            else noFalse++;
+        }
+        return (double) noTrue / (noTrue + noFalse);
+    }
     public static double[] coordinateRMSE(ArrayList<Node> actualPos, ArrayList<Node> predictedPos, double t, int noDataPoints) { //flag: 0 for the old way, 1 for polynomial regression
 
         double RMSEx = 0;
