@@ -202,7 +202,7 @@ public class ReadOutput {
         return maxA;
     }
 
-    public double accelerationAtGivenTime(int VRUid, int timeStep) throws FileNotFoundException {
+    public double accelerationAtGivenTime(int VRUid, int timeStep, double t) throws FileNotFoundException {
 
         vsc = new Scanner(vDataOutput);
         vsc.useLocale(Locale.US);
@@ -219,7 +219,7 @@ public class ReadOutput {
 
             if(timeStep == timePassed)
                 if (VRUid == vsc.nextInt())
-                    a = (vsc.nextDouble() - previousV) / 0.1;
+                    a = (vsc.nextDouble() - previousV) / t;
 
             vsc.nextLine();
         }
