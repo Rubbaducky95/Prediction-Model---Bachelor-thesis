@@ -143,9 +143,101 @@ public class ToTxt {
 
         String filePath;
         if (flag == 1)
-            filePath = directoryPath + "result_minMax_RMSE_allVRUs_AutoDPs.txt";
+            filePath = directoryPath + "_minMax_RMSE_CFCModel.txt";
         else
             filePath = directoryPath + "result_minMax_RMSE_allVRUs_" + noDataPoints + "DPs.txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void meanMinMaxRMSEforVRUsWithSpecDataPoints(ReadOutput vadereOutput, double t, int noDataPoints, int flag) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("mean min max\n");
+        int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Double> RMSE = new ArrayList<>();
+        double totRMSE = 0;
+
+        for (int i = 1; i <= totNrVRUs; i++) {
+
+            ArrayList<Node> VRU = vadereOutput.getDataFor(i);
+            double curRMSE = Model.positionalRMSE(VRU, Model.getPredictionList(VRU, t, noDataPoints, flag));
+            RMSE.add(curRMSE);
+            totRMSE += curRMSE;
+            VRU.clear();
+        }
+
+        output.append(totRMSE / totNrVRUs).append(" ");
+        output.append(Collections.min(RMSE)).append(" ");
+        output.append(Collections.max(RMSE)).append("\n");
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath;
+        if (flag == 1)
+            filePath = directoryPath + "_meanMinMax_RMSE_CFCModel.txt";
+        else
+            filePath = directoryPath + "meanMinMax_RMSE_allVRUs_" + noDataPoints + "DPs.txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void weightedMeanMinMaxRMSEforVRUsWithSpecDataPoints(ReadOutput vadereOutput, double t, int noDataPoints, int flag, double weight) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("mean min max\n");
+        int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Double> RMSE = new ArrayList<>();
+        double totRMSE = 0;
+
+        for (int i = 1; i <= totNrVRUs; i++) {
+
+            ArrayList<Node> VRU = vadereOutput.getDataFor(i);
+            double curRMSE = Model.positionalRMSE(VRU, Model.getWeightedPredictionList(VRU, t, noDataPoints, flag,weight));
+            RMSE.add(curRMSE);
+            totRMSE += curRMSE;
+            VRU.clear();
+        }
+
+        output.append(totRMSE / totNrVRUs).append(" ");
+        output.append(Collections.min(RMSE)).append(" ");
+        output.append(Collections.max(RMSE)).append("\n");
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath;
+        if (flag == 1)
+            filePath = directoryPath + "_weightedMeanMinMax_RMSE_CFCModel.txt";
+        else
+            filePath = directoryPath + "weightedMeanMinMax_RMSE_allVRUs_" + noDataPoints + "DPs.txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
@@ -185,7 +277,95 @@ public class ToTxt {
 
         String filePath;
 
-        filePath = directoryPath + "result_minMax_RMSE_MeanPred_" + noDataPoints + "DPs.txt";
+        filePath = directoryPath + "_minMax_RMSE_MeanModel_2-" + noDataPoints + "DPs.txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void meanMinMaxRMSEforVRUsWithMeanPrediction(ReadOutput vadereOutput, double t, int noDataPoints) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("mean minRMSE maxRMSE\n");
+        int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Double> RMSE = new ArrayList<>();
+        double totRMSE = 0;
+
+        for (int i = 1; i <= totNrVRUs; i++) {
+
+            ArrayList<Node> VRU = vadereOutput.getDataFor(i);
+            double curRMSE = Model.positionalRMSE(VRU, Model.getMeanPredictionList(VRU,t,noDataPoints));
+            RMSE.add(curRMSE);
+            totRMSE += curRMSE;
+            VRU.clear();
+        }
+
+        output.append(totRMSE / totNrVRUs).append(" ");
+        output.append(Collections.min(RMSE)).append(" ");
+        output.append(Collections.max(RMSE)).append("\n");
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath;
+
+        filePath = directoryPath + "_meanMinMax_RMSE_MeanModel_2-" + noDataPoints + "DPs.txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void weightedMeanMinMaxRMSEforVRUsWithMeanPrediction(ReadOutput vadereOutput, double t, int noDataPoints, double weight) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("mean minRMSE maxRMSE\n");
+        int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Double> RMSE = new ArrayList<>();
+        double totRMSE = 0;
+
+        for (int i = 1; i <= totNrVRUs; i++) {
+
+            ArrayList<Node> VRU = vadereOutput.getDataFor(i);
+            double curRMSE = Model.positionalRMSE(VRU, Model.getWeightedMeanPredictionList(VRU,t,noDataPoints,weight));
+            RMSE.add(curRMSE);
+            totRMSE += curRMSE;
+            VRU.clear();
+        }
+
+        output.append(totRMSE / totNrVRUs).append(" ");
+        output.append(Collections.min(RMSE)).append(" ");
+        output.append(Collections.max(RMSE)).append("\n");
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath;
+
+        filePath = directoryPath + "_weightedMeanMinMax_RMSE_MeanModel_2-" + noDataPoints + "DPs.txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
@@ -206,7 +386,10 @@ public class ToTxt {
             for (int j = 1; j <= totNrVRUs; j++) {
 
                 ArrayList<Node> VRU = vadereOutput.getDataFor(j);
-                RMSE.add(Model.positionalRMSE(VRU, Model.getPredictionList(VRU, t, i, flag)));
+                if(flag==2)
+                    RMSE.add(Model.positionalRMSE(VRU, Model.getMeanPredictionList(VRU,t,i)));
+                else
+                    RMSE.add(Model.positionalRMSE(VRU, Model.getPredictionList(VRU, t, i, flag)));
                 VRU.clear();
             }
             output.append(i).append(" ");
@@ -228,6 +411,60 @@ public class ToTxt {
         }
 
         String filePath = directoryPath + "result_minMax_RMSE_dataPoints.txt";
+
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(String.valueOf(output));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void meanMinMaxRMSEforDataPoints(ReadOutput vadereOutput, double t, int lowerLimitDP, int upperLimitDP, int flag) throws FileNotFoundException {
+
+        StringBuilder output = new StringBuilder("no.DataPoints mean min max\n");
+        int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Double> RMSE = new ArrayList<>();
+        double totRMSE = 0;
+        double curRMSE = 0;
+
+        for(int i = lowerLimitDP; i <= upperLimitDP; i++) {
+
+            for (int j = 1; j <= totNrVRUs; j++) {
+
+                ArrayList<Node> VRU = vadereOutput.getDataFor(j);
+                if(flag==2) {
+                    curRMSE = Model.positionalRMSE(VRU, Model.getMeanPredictionList(VRU, t, i));
+                    RMSE.add(curRMSE);
+                }
+                else {
+                    curRMSE = Model.positionalRMSE(VRU, Model.getPredictionList(VRU, t, i, flag));
+                    RMSE.add(curRMSE);
+                }
+                totRMSE += curRMSE;
+                VRU.clear();
+            }
+            output.append(i).append(" ");
+            output.append(totRMSE / totNrVRUs).append(" ");
+            output.append(Collections.min(RMSE)).append(" ");
+            output.append(Collections.max(RMSE)).append("\n");
+            RMSE.clear();
+            totRMSE = 0;
+        }
+
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
+        // Ensure the directory path ends with a file separator (e.g., '/')
+        if (!directoryPath.endsWith(File.separator)) {
+            directoryPath += File.separator;
+        }
+
+        // Create the directory if it does not exist
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String filePath = directoryPath + "_meanMinMax_RMSE_dataPoints_" + lowerLimitDP + "-" + upperLimitDP + ".txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
@@ -305,8 +542,11 @@ public class ToTxt {
         if (!directory.exists()) {
             directory.mkdirs();
         }
-
-        String filePath = directoryPath + "result_predPos_" + noDataPoints + "DPs_" + "VRU" + VRUid + ".txt";
+        String filePath;
+        if(flag==1)
+            filePath = directoryPath + "_CFC_VRU" + VRUid + ".txt";
+        else
+            filePath = directoryPath + "result_predPos_" + noDataPoints + "DPs_" + "VRU" + VRUid + ".txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
@@ -341,7 +581,7 @@ public class ToTxt {
             directory.mkdirs();
         }
 
-        String filePath = directoryPath + "result_predMeanPos_from" + noDataPoints + "to2DPs_VRU" + VRUid + ".txt";
+        String filePath = directoryPath + "_MeanModel_2-" + noDataPoints + "DPs_VRU" + VRUid + ".txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
@@ -387,12 +627,12 @@ public class ToTxt {
             e.printStackTrace();
         }
     }
-    public static void APFPForVRU(ReadOutput vadereOutput, double t, int noDataPoints, int VRUid) throws FileNotFoundException {
+    public static void APFPForVRU(ReadOutput vadereOutput, double t, int noDataPoints, int VRUid, int flag) throws FileNotFoundException {
 
 
-        StringBuilder output = new StringBuilder("currPosX currPosY predPosX predPosY posX posY negX negY angle\n");
+        StringBuilder output = new StringBuilder("currPosX currPosY predPosX predPosY posX posY negX negY angle direction\n");
         ArrayList<Node> actualPositions = vadereOutput.getDataFor(VRUid);
-        ArrayList<APFP> APFPforVRU = Model.getAPFPList(actualPositions,t,noDataPoints,0);
+        ArrayList<APFP> APFPforVRU = Model.getAPFPList(actualPositions,t,noDataPoints,flag);
 
         for(APFP a : APFPforVRU) {
 
@@ -404,10 +644,11 @@ public class ToTxt {
             output.append(a.posY).append(" ");
             output.append(a.negX).append(" ");
             output.append(a.negY).append(" ");
-            output.append(a.angle).append("\n");
+            output.append(a.angle).append(" ");
+            output.append(a.direction).append("\n");
         }
 
-        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Dokument\\Högskolan\\DCTVT24\\EXAMENS ARBETE\\MatLab\\";
+        String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
         // Ensure the directory path ends with a file separator (e.g., '/')
         if (!directoryPath.endsWith(File.separator)) {
             directoryPath += File.separator;
@@ -433,16 +674,22 @@ public class ToTxt {
 
         StringBuilder output = new StringBuilder("Differences in distance:\n");
         int totNrVRUs = vadereOutput.totalNrOfVRUs();
+        ArrayList<Node> predictedPos = new ArrayList<>();
 
         double distanceBetween;
 
-        for(int i = 0; i < totNrVRUs; i++) {
+        for(int i = 1; i <= totNrVRUs; i++) {
             ArrayList<Node> actualPos = vadereOutput.getDataFor(i);
-            ArrayList<Node> predictedPos = Model.getPredictionList(actualPos,t,noDataPoints,flag);
+            if(flag == 2)
+                predictedPos = Model.getMeanPredictionList(actualPos,t,noDataPoints);
+            else
+                predictedPos = Model.getPredictionList(actualPos,t,noDataPoints,flag);
             for(int j = 0; j < actualPos.size(); j++) {
                 if((distanceBetween = actualPos.get(j).distanceBetween(predictedPos.get(j))) != 0)
                     output.append(distanceBetween).append("\n");
             }
+            actualPos.clear();
+            predictedPos.clear();
         }
         String directoryPath = "C:\\Users\\ruben\\OneDrive\\Documents\\Datateknik VT 24\\EXAMENSARBETE\\MatLab\\";
         // Ensure the directory path ends with a file separator (e.g., '/')
@@ -456,7 +703,11 @@ public class ToTxt {
             directory.mkdirs();
         }
 
-        String filePath = directoryPath + "differenceInPos.txt";
+        String filePath = directoryPath + "_diffInPos";
+        if(flag==1)
+            filePath += "_CFCModel.txt";
+        else if(flag==2)
+            filePath += "_MeanModel_2-" + noDataPoints + "DPs.txt";
 
         try {
             FileWriter writer = new FileWriter(filePath);
