@@ -291,7 +291,7 @@ public class Model {
         ArrayList<Node> temp = new ArrayList<>();
         ArrayList<APFP> APFPList = new ArrayList<>();
         Node prevPos = nList.get(0);
-        Node prevPrevPos = nList.get(0);a
+        Node prevPrevPos = nList.get(0);
         Node predPos;
         double[] predPosMean = {0.0, 0.0};
 
